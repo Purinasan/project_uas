@@ -35,7 +35,7 @@ if ($has_biodata) {
     <div class="dashboard-container">
         <nav class="sidebar">
             <div class="logo">
-                <h2>SDM System</h2>
+                <h2>PT Maju Mundur</h2>
             </div>
             <ul class="nav-menu">
                 <li class="active"><a href="dashboard_karyawan.php">🏠 Dashboard</a></li>

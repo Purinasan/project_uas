@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_pk'])) {
 <body class="dashboard-body">
     <div class="dashboard-container">
         <nav class="sidebar">
-            <div class="logo"><h2>SDM System</h2></div>
+            <div class="logo"><h2>PT Maju Mundur</h2></div>
             <ul class="nav-menu">
                 <li><a href="dashboard_karyawan.php">🏠 Dashboard</a></li>
                 <li class="active"><a href="biodata.php">📋 Biodata</a></li>
