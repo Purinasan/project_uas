@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="left-panel">
             <div class="left-content">
                 <h1>WELCOME<br>BACK!</h1>
-                <p>Lorem ipsum, dolor sit amet consectetur adipisicing.</p>
+                <p>Welcome to PT Maju Mundur</p>
             </div>
         </div>
         
