@@ -1,5 +1,4 @@
 <?php
-// detail_karyawan.php
 session_start();
 require_once '../config.php';
 
@@ -55,16 +54,26 @@ $lowongan_result = mysqli_query($conn, $lowongan_query);
     <style>
         .detail-container { background: white; padding: 30px; border-radius: 10px; }
         .info-card { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #667eea; }
-        .info-row { display: grid; grid-template-columns: 150px 1fr; gap: 15px; margin-bottom: 10px; }
+        .info-row { display: grid; grid-template-columns: 200px 1fr; gap: 15px; margin-bottom: 10px; }
         .info-label { font-weight: 600; color: #333; }
         .info-value { color: #555; }
-        .section-title { color: #667eea; border-bottom: 2px solid #667eea; padding-bottom: 10px; margin: 30px 0 20px 0; }
+        .section-title { 
+            color: #667eea; border-bottom: 2px solid #667eea; padding-bottom: 10px; 
+            margin: 30px 0 20px 0; font-size: 1.3rem; 
+        }
         .table-container { margin-top: 15px; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
         th { background: #f8f9fa; color: #333; }
-        .btn-back { display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; margin-bottom: 20px; }
+        .btn-back { 
+            display: inline-block; padding: 10px 20px; background: #667eea; 
+            color: white; text-decoration: none; border-radius: 5px; margin-bottom: 20px; 
+        }
         .btn-back:hover { background: #764ba2; }
+        .address-section { 
+            background: white; padding: 15px; border-radius: 5px; 
+            border: 1px solid #e0e0e0; margin-top: 10px; 
+        }
     </style>
 </head>
 <body class="dashboard-body">
@@ -96,14 +105,18 @@ $lowongan_result = mysqli_query($conn, $lowongan_query);
                 <a href="tampilkan_karyawan.php" class="btn-back">← Kembali</a>
                 
                 <div class="detail-container">
-                    <h2 style="margin-bottom: 25px;">Data Calon Karyawan</h2>
+                    <h2 style="margin-bottom: 25px;">📋 Data Calon Karyawan Lengkap</h2>
                     
-                    <!-- Biodata Section -->
+                    <!-- Data Identitas -->
                     <div class="info-card">
-                        <h3>📋 Informasi Pribadi</h3>
+                        <h3>🆔 Data Identitas</h3>
                         <div class="info-row">
                             <div class="info-label">Username:</div>
                             <div class="info-value"><?php echo htmlspecialchars($biodata['username']); ?></div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">NIK:</div>
+                            <div class="info-value"><?php echo htmlspecialchars($biodata['nik'] ?? '-'); ?></div>
                         </div>
                         <div class="info-row">
                             <div class="info-label">Nama Lengkap:</div>
@@ -113,12 +126,51 @@ $lowongan_result = mysqli_query($conn, $lowongan_query);
                             <div class="info-label">Tempat, Tgl Lahir:</div>
                             <div class="info-value"><?php echo htmlspecialchars($biodata['ttl']); ?></div>
                         </div>
+                    </div>
+                    
+                    <!-- Alamat Lengkap -->
+                    <div class="info-card">
+                        <h3>📍 Alamat Lengkap</h3>
+                        <div class="address-section">
+                            <p style="margin: 0 0 10px 0;"><strong>Alamat:</strong></p>
+                            <p style="margin: 0 0 15px 0; color: #555;"><?php echo nl2br(htmlspecialchars($biodata['alamat'])); ?></p>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                                <div>
+                                    <strong>Provinsi:</strong> <?php echo htmlspecialchars($biodata['provinsi'] ?? '-'); ?>
+                                </div>
+                                <div>
+                                    <strong>Kota/Kabupaten:</strong> <?php echo htmlspecialchars($biodata['kota_kabupaten'] ?? '-'); ?>
+                                </div>
+                                <div>
+                                    <strong>Kecamatan:</strong> <?php echo htmlspecialchars($biodata['kecamatan'] ?? '-'); ?>
+                                </div>
+                                <div>
+                                    <strong>Kelurahan/Desa:</strong> <?php echo htmlspecialchars($biodata['kelurahan_desa'] ?? '-'); ?>
+                                </div>
+                                <div>
+                                    <strong>RT/RW:</strong> <?php echo htmlspecialchars($biodata['rt_rw'] ?? '-'); ?>
+                                </div>
+                                <div>
+                                    <strong>Kode Pos:</strong> <?php echo htmlspecialchars($biodata['kode_pos'] ?? '-'); ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Data Pribadi -->
+                    <div class="info-card">
+                        <h3>👤 Data Pribadi</h3>
                         <div class="info-row">
                             <div class="info-label">Jenis Kelamin:</div>
                             <div class="info-value"><?php echo $biodata['jenis_kelamin'] == 'L' ? 'Laki-laki' : 'Perempuan'; ?></div>
                         </div>
                         <div class="info-row">
-                            <div class="info-label">Status:</div>
+                            <div class="info-label">Golongan Darah:</div>
+                            <div class="info-value"><?php echo htmlspecialchars($biodata['golongan_darah'] ?? '-'); ?></div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Status Perkawinan:</div>
                             <div class="info-value">
                                 <?php 
                                 $status = [
@@ -131,9 +183,22 @@ $lowongan_result = mysqli_query($conn, $lowongan_query);
                             </div>
                         </div>
                         <div class="info-row">
+                            <div class="info-label">Pekerjaan Saat Ini:</div>
+                            <div class="info-value"><?php echo htmlspecialchars($biodata['pekerjaan'] ?? '-'); ?></div>
+                        </div>
+                        <div class="info-row">
                             <div class="info-label">Agama:</div>
                             <div class="info-value"><?php echo htmlspecialchars($biodata['agama']); ?></div>
                         </div>
+                        <div class="info-row">
+                            <div class="info-label">Kewarganegaraan:</div>
+                            <div class="info-value"><?php echo htmlspecialchars($biodata['kewarganegaraan'] ?? '-'); ?></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Kontak -->
+                    <div class="info-card">
+                        <h3>📞 Informasi Kontak</h3>
                         <div class="info-row">
                             <div class="info-label">Email:</div>
                             <div class="info-value"><?php echo htmlspecialchars($biodata['email']); ?></div>
@@ -141,10 +206,6 @@ $lowongan_result = mysqli_query($conn, $lowongan_query);
                         <div class="info-row">
                             <div class="info-label">No. HP:</div>
                             <div class="info-value"><?php echo htmlspecialchars($biodata['no_hp']); ?></div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Alamat:</div>
-                            <div class="info-value"><?php echo nl2br(htmlspecialchars($biodata['alamat'])); ?></div>
                         </div>
                     </div>
                     
