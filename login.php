@@ -2,7 +2,6 @@
 session_start();
 require_once 'config.php';
 
-// Redirect if already logged in
 if (isset($_SESSION['user_id'])) {
     header("Location: dashboard.php");
     exit();
@@ -42,55 +41,87 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login - PT Maju Mundur</title>
-    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="assets/adminlte/plugins/fontawesome-free/css/all.min.css">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="assets/adminlte/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="assets/adminlte/dist/css/adminlte.min.css">
+    
+    <style>
+        .login-page {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .login-card-body, .register-card-body {
+            border-radius: 10px;
+        }
+        .login-logo a {
+            color: white;
+            font-weight: bold;
+        }
+    </style>
 </head>
-<body>
-    <div class="container">
-        <div class="left-panel">
-            <div class="left-content">
-                <h1>WELCOME<br>BACK!</h1>
-                <p>welcome to PT Maju Mundur</p>
-            </div>
-        </div>
-        
-        <div class="right-panel">
-            <div class="login-box">
-                <h2>Login</h2>
-                
-                <?php if ($error): ?>
-                    <div class="error-message">
-                        <?php echo $error; ?>
-                    </div>
-                <?php endif; ?>
-                
-                <form method="POST" action="">
-                    <div class="input-group">
-                        <label>Username</label>
-                        <div class="input-wrapper">
-                            <input type="text" name="username" placeholder="Ah" required>
-                            <span class="input-icon">👤</span>
-                        </div>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label>Password</label>
-                        <div class="input-wrapper">
-                            <input type="password" name="password" placeholder="••••••••" required>
-                            <span class="input-icon">🔒</span>
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="btn-login">Login</button>
-                    
-                    <div class="signup-link">
-                        Dont have an account? <a href="register.php">Sign Up</a>
-                    </div>
-                </form>
-            </div>
-        </div>
+<body class="hold-transition login-page">
+<div class="login-box">
+    <div class="login-logo">
+        <a href="#"><b>PT Maju</b> Mundur</a>
     </div>
+    <!-- /.login-logo -->
+    <div class="card">
+        <div class="card-body login-card-body">
+            <p class="login-box-msg">Silahkan login untuk melanjutkan</p>
+
+            <?php if ($error): ?>
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    <i class="icon fas fa-ban"></i> <?php echo $error; ?>
+                </div>
+            <?php endif; ?>
+
+            <form action="" method="post">
+                <div class="input-group mb-3">
+                    <input type="text" name="username" class="form-control" placeholder="Username" required>
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-user"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="password" name="password" class="form-control" placeholder="Password" required>
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-lock"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary btn-block">Login</button>
+                    </div>
+                </div>
+            </form>
+
+            <p class="mb-0 mt-3">
+                <a href="register.php" class="text-center">Belum punya akun? Sign Up</a>
+            </p>
+        </div>
+        <!-- /.login-card-body -->
+    </div>
+</div>
+<!-- /.login-box -->
+
+<!-- jQuery -->
+<script src="assets/adminlte/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="assets/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="assets/adminlte/dist/js/adminlte.min.js"></script>
 </body>
 </html>
