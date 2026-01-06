@@ -1,5 +1,4 @@
 <?php
-// kelola_lowongan.php
 session_start();
 require_once '../config.php';
 
@@ -12,18 +11,15 @@ $username = $_SESSION['username'];
 $success = "";
 $error = "";
 
-// Get all lowongan
 $query = "SELECT l.*, p.nama_periode 
           FROM lowongan l 
           LEFT JOIN periode p ON l.id_periode = p.id_periode 
           ORDER BY l.tgl_buka DESC";
 $result = mysqli_query($conn, $query);
 
-// Get all periode for dropdown
 $periode_query = "SELECT * FROM periode ORDER BY id_periode DESC";
 $periode_result = mysqli_query($conn, $periode_query);
 
-// Handle add lowongan
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_lowongan'])) {
     $posisi = mysqli_real_escape_string($conn, $_POST['posisi']);
     $persyaratan = mysqli_real_escape_string($conn, $_POST['persyaratan']);
@@ -45,7 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_lowongan'])) {
     }
 }
 
-// Handle delete lowongan
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     $delete = "DELETE FROM lowongan WHERE id_lowongan = $id";
@@ -53,172 +48,207 @@ if (isset($_GET['delete'])) {
         $success = "Lowongan berhasil dihapus!";
         header("Location: kelola_lowongan.php");
         exit();
-    } else {
-        $error = "Error: " . mysqli_error($conn);
     }
 }
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola Lowongan - Admin</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <style>
-        .table-container { background: white; padding: 25px; border-radius: 10px; margin-bottom: 30px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 15px 12px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 600; }
-        .btn-action { padding: 5px 12px; text-decoration: none; border-radius: 5px; font-size: 12px; margin-right: 5px; }
-        .btn-edit { background: #28a745; color: white; }
-        .btn-delete { background: #dc3545; color: white; }
-        .btn-add { padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; margin-bottom: 20px; display: inline-block; }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
-        .modal-content { background: white; margin: 5% auto; padding: 30px; width: 90%; max-width: 600px; border-radius: 10px; }
-        .close { float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
-        .form-group textarea { min-height: 100px; resize: vertical; }
-    </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kelola Lowongan - PT Maju Mundur</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
 </head>
-<body class="dashboard-body">
-    <div class="dashboard-container">
-        <nav class="sidebar">
-            <div class="logo"><h2>PT Maju Mundur</h2></div>
-            <ul class="nav-menu">
-                <li><a href="dashboard_admin.php">🏠 Dashboard</a></li>
-                <li><a href="tampilkan_karyawan.php">👥 Tampilkan Karyawan</a></li>
-                <li><a href="upload_nilai.php">📝 Upload Nilai</a></li>
-                <li class="active"><a href="kelola_lowongan.php">💼 Kelola Lowongan</a></li>
-                <li><a href="kelola_periode.php">📅 Kelola Periode</a></li>
-            </ul>
-            <div class="nav-footer">
-                <a href="../logout.php" class="logout-btn">🚪 Logout</a>
-            </div>
-        </nav>
-        
-        <main class="main-content">
-            <header class="top-bar">
-                <h1>Kelola Lowongan</h1>
-                <div class="user-info">
-                    <span class="user-role">Admin</span>
-                    <span class="user-name"><?php echo htmlspecialchars($username); ?></span>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+
+    <?php include 'includes/header.php'; ?>
+    <?php include 'includes/sidebar.php'; ?>
+
+    <div class="content-wrapper">
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Kelola Lowongan</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="dashboard_admin.php">Home</a></li>
+                            <li class="breadcrumb-item active">Kelola Lowongan</li>
+                        </ol>
+                    </div>
                 </div>
-            </header>
-            
-            <div class="content">
+            </div>
+        </div>
+
+        <section class="content">
+            <div class="container-fluid">
                 <?php if ($success): ?>
-                    <div class="success-message"><?php echo $success; ?></div>
+                <div class="alert alert-success alert-dismissible fade show">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <i class="icon fas fa-check"></i> <?php echo $success; ?>
+                </div>
                 <?php endif; ?>
+                
                 <?php if ($error): ?>
-                    <div class="error-message"><?php echo $error; ?></div>
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <i class="icon fas fa-ban"></i> <?php echo $error; ?>
+                </div>
                 <?php endif; ?>
-                
-                <a href="javascript:void(0)" class="btn-add" onclick="document.getElementById('addModal').style.display='block'">+ Tambah Lowongan</a>
-                
-                <div class="table-container">
-                    <h3 style="margin-bottom: 20px;">Daftar Lowongan</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Posisi</th>
-                                <th>Periode</th>
-                                <th>Tanggal Buka</th>
-                                <th>Tanggal Tutup</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php 
-                            $no = 1;
-                            mysqli_data_seek($result, 0);
-                            while ($row = mysqli_fetch_assoc($result)): 
-                            ?>
-                            <tr>
-                                <td><?php echo $no++; ?></td>
-                                <td><?php echo htmlspecialchars($row['posisi']); ?></td>
-                                <td><?php echo $row['nama_periode'] ?? '-'; ?></td>
-                                <td><?php echo date('d/m/Y', strtotime($row['tgl_buka'])); ?></td>
-                                <td><?php echo date('d/m/Y', strtotime($row['tgl_tutup'])); ?></td>
-                                <td>
-                                    <a href="edit_lowongan.php?id=<?php echo $row['id_lowongan']; ?>" class="btn-action btn-edit">Edit</a>
-                                    <a href="kelola_lowongan.php?delete=<?php echo $row['id_lowongan']; ?>" class="btn-action btn-delete" onclick="return confirm('Hapus lowongan ini?')">Hapus</a>
-                                </td>
-                            </tr>
-                            <?php endwhile; ?>
-                        </tbody>
-                    </table>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-briefcase mr-2"></i>Daftar Lowongan</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addModal">
+                                <i class="fas fa-plus"></i> Tambah Lowongan
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table id="lowonganTable" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Posisi</th>
+                                    <th>Periode</th>
+                                    <th>Tanggal Buka</th>
+                                    <th>Tanggal Tutup</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                $no = 1;
+                                mysqli_data_seek($result, 0);
+                                while ($row = mysqli_fetch_assoc($result)): 
+                                ?>
+                                <tr>
+                                    <td><?php echo $no++; ?></td>
+                                    <td><?php echo htmlspecialchars($row['posisi']); ?></td>
+                                    <td><?php echo $row['nama_periode'] ?? '-'; ?></td>
+                                    <td><?php echo date('d/m/Y', strtotime($row['tgl_buka'])); ?></td>
+                                    <td><?php echo date('d/m/Y', strtotime($row['tgl_tutup'])); ?></td>
+                                    <td>
+                                        <a href="edit_lowongan.php?id=<?php echo $row['id_lowongan']; ?>" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="kelola_lowongan.php?delete=<?php echo $row['id_lowongan']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Hapus lowongan ini?')">
+                                            <i class="fas fa-trash"></i> Hapus
+                                        </a>
+                                    </td>
+                                </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </main>
+        </section>
     </div>
-    
-    <!-- Modal Tambah Lowongan -->
-    <div id="addModal" class="modal">
+
+    <?php include 'includes/footer.php'; ?>
+</div>
+
+<!-- Modal Tambah Lowongan -->
+<div class="modal fade" id="addModal">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <span class="close" onclick="document.getElementById('addModal').style.display='none'">&times;</span>
-            <h3 style="margin-bottom: 20px;">Tambah Lowongan Baru</h3>
             <form method="POST">
-                <div class="form-group">
-                    <label>Posisi *</label>
-                    <input type="text" name="posisi" required placeholder="Contoh: Software Engineer">
+                <div class="modal-header bg-primary">
+                    <h4 class="modal-title">Tambah Lowongan Baru</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
-                
-                <div class="form-group">
-                    <label>Periode</label>
-                    <select name="id_periode" required>
-                        <option value="">Pilih Periode</option>
-                        <?php while ($periode = mysqli_fetch_assoc($periode_result)): ?>
-                        <option value="<?php echo $periode['id_periode']; ?>"><?php echo $periode['nama_periode']; ?></option>
-                        <?php endwhile; ?>
-                    </select>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Posisi <span class="text-danger">*</span></label>
+                        <input type="text" name="posisi" class="form-control" required placeholder="Contoh: Software Engineer">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Periode <span class="text-danger">*</span></label>
+                        <select name="id_periode" class="form-control" required>
+                            <option value="">Pilih Periode</option>
+                            <?php 
+                            mysqli_data_seek($periode_result, 0);
+                            while ($periode = mysqli_fetch_assoc($periode_result)): 
+                            ?>
+                            <option value="<?php echo $periode['id_periode']; ?>"><?php echo $periode['nama_periode']; ?></option>
+                            <?php endwhile; ?>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Persyaratan <span class="text-danger">*</span></label>
+                        <textarea name="persyaratan" class="form-control" rows="4" required placeholder="Masukkan persyaratan lowongan..."></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Tanggal Buka <span class="text-danger">*</span></label>
+                                <input type="date" name="tgl_buka" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Tanggal Tutup <span class="text-danger">*</span></label>
+                                <input type="date" name="tgl_tutup" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Tanggal Interview <span class="text-danger">*</span></label>
+                                <input type="date" name="tgl_interview" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Tanggal TKD <span class="text-danger">*</span></label>
+                                <input type="date" name="tgl_tkd" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Tanggal Pengumuman Hasil <span class="text-danger">*</span></label>
+                        <input type="date" name="pengumuman_hasil" class="form-control" required>
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label>Persyaratan *</label>
-                    <textarea name="persyaratan" required placeholder="Masukkan persyaratan lowongan..."></textarea>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="submit" name="add_lowongan" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Simpan Lowongan
+                    </button>
                 </div>
-                
-                <div class="form-group">
-                    <label>Tanggal Buka *</label>
-                    <input type="date" name="tgl_buka" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Tanggal Tutup *</label>
-                    <input type="date" name="tgl_tutup" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Tanggal Interview *</label>
-                    <input type="date" name="tgl_interview" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Tanggal TKD *</label>
-                    <input type="date" name="tgl_tkd" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Tanggal Pengumuman Hasil *</label>
-                    <input type="date" name="pengumuman_hasil" required>
-                </div>
-                
-                <button type="submit" name="add_lowongan" class="btn-add" style="width: 100%; padding: 12px; margin-top: 10px;">Simpan Lowongan</button>
             </form>
         </div>
     </div>
-    
-    <script>
-        window.onclick = function(event) {
-            var modal = document.getElementById('addModal');
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.1/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/js/adminlte.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#lowonganTable').DataTable({
+        "responsive": true,
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/id.json"
         }
-    </script>
+    });
+});
+</script>
 </body>
 </html>

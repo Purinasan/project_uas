@@ -16,7 +16,6 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 
 $id_biodata = mysqli_real_escape_string($conn, $_GET['id']);
 
-// Get biodata details
 $query = "SELECT b.*, u.username 
           FROM biodata b 
           JOIN users u ON b.id_user = u.id_user 
@@ -29,15 +28,12 @@ if (!$biodata) {
     exit();
 }
 
-// Get pendidikan
 $pendidikan_query = "SELECT * FROM pendidikan WHERE id_biodata = '$id_biodata'";
 $pendidikan_result = mysqli_query($conn, $pendidikan_query);
 
-// Get pengalaman kerja
 $pk_query = "SELECT * FROM pengalaman_kerja WHERE id_biodata = '$id_biodata'";
 $pk_result = mysqli_query($conn, $pk_query);
 
-// Get lowongan yang dipilih
 $lowongan_query = "SELECT pl.*, l.posisi, l.tgl_interview, l.tgl_tkd 
                    FROM pemilihan_lowongan pl 
                    JOIN lowongan l ON pl.id_lowongan = l.id_lowongan 
@@ -47,131 +43,109 @@ $lowongan_result = mysqli_query($conn, $lowongan_query);
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detail Karyawan - Admin</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <style>
-        .detail-container { background: white; padding: 30px; border-radius: 10px; }
-        .info-card { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #667eea; }
-        .info-row { display: grid; grid-template-columns: 200px 1fr; gap: 15px; margin-bottom: 10px; }
-        .info-label { font-weight: 600; color: #333; }
-        .info-value { color: #555; }
-        .section-title { 
-            color: #667eea; border-bottom: 2px solid #667eea; padding-bottom: 10px; 
-            margin: 30px 0 20px 0; font-size: 1.3rem; 
-        }
-        .table-container { margin-top: 15px; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background: #f8f9fa; color: #333; }
-        .btn-back { 
-            display: inline-block; padding: 10px 20px; background: #667eea; 
-            color: white; text-decoration: none; border-radius: 5px; margin-bottom: 20px; 
-        }
-        .btn-back:hover { background: #764ba2; }
-        .address-section { 
-            background: white; padding: 15px; border-radius: 5px; 
-            border: 1px solid #e0e0e0; margin-top: 10px; 
-        }
-    </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Detail Karyawan - PT Maju Mundur</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/css/adminlte.min.css">
 </head>
-<body class="dashboard-body">
-    <div class="dashboard-container">
-        <nav class="sidebar">
-            <div class="logo"><h2>PT Maju Mundur</h2></div>
-            <ul class="nav-menu">
-                <li><a href="dashboard_admin.php">🏠 Dashboard</a></li>
-                <li class="active"><a href="tampilkan_karyawan.php">👥 Tampilkan Karyawan</a></li>
-                <li><a href="upload_nilai.php">📝 Upload Nilai</a></li>
-                <li><a href="kelola_lowongan.php">💼 Kelola Lowongan</a></li>
-                <li><a href="kelola_periode.php">📅 Kelola Periode</a></li>
-            </ul>
-            <div class="nav-footer">
-                <a href="../logout.php" class="logout-btn">🚪 Logout</a>
-            </div>
-        </nav>
-        
-        <main class="main-content">
-            <header class="top-bar">
-                <h1>Detail Karyawan</h1>
-                <div class="user-info">
-                    <span class="user-role">Admin</span>
-                    <span class="user-name"><?php echo htmlspecialchars($username); ?></span>
-                </div>
-            </header>
-            
-            <div class="content">
-                <a href="tampilkan_karyawan.php" class="btn-back">← Kembali</a>
-                
-                <div class="detail-container">
-                    <h2 style="margin-bottom: 25px;">📋 Data Calon Karyawan Lengkap</h2>
-                    
-                    <!-- Data Identitas -->
-                    <div class="info-card">
-                        <h3>🆔 Data Identitas</h3>
-                        <div class="info-row">
-                            <div class="info-label">Username:</div>
-                            <div class="info-value"><?php echo htmlspecialchars($biodata['username']); ?></div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">NIK:</div>
-                            <div class="info-value"><?php echo htmlspecialchars($biodata['nik'] ?? '-'); ?></div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Nama Lengkap:</div>
-                            <div class="info-value"><?php echo htmlspecialchars($biodata['nama']); ?></div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Tempat, Tgl Lahir:</div>
-                            <div class="info-value"><?php echo htmlspecialchars($biodata['ttl']); ?></div>
-                        </div>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+
+    <?php include 'includes/header.php'; ?>
+    <?php include 'includes/sidebar.php'; ?>
+
+    <div class="content-wrapper">
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Detail Calon Karyawan</h1>
                     </div>
-                    
-                    <!-- Alamat Lengkap -->
-                    <div class="info-card">
-                        <h3>📍 Alamat Lengkap</h3>
-                        <div class="address-section">
-                            <p style="margin: 0 0 10px 0;"><strong>Alamat:</strong></p>
-                            <p style="margin: 0 0 15px 0; color: #555;"><?php echo nl2br(htmlspecialchars($biodata['alamat'])); ?></p>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="dashboard_admin.php">Home</a></li>
+                            <li class="breadcrumb-item"><a href="tampilkan_karyawan.php">Karyawan</a></li>
+                            <li class="breadcrumb-item active">Detail</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <a href="tampilkan_karyawan.php" class="btn btn-secondary mb-3">
+                            <i class="fas fa-arrow-left"></i> Kembali
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Data Identitas -->
+                <div class="card card-primary card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-id-card mr-2"></i>Data Identitas</h3>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-3">Username</dt>
+                            <dd class="col-sm-9"><?php echo htmlspecialchars($biodata['username']); ?></dd>
                             
-                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                                <div>
-                                    <strong>Provinsi:</strong> <?php echo htmlspecialchars($biodata['provinsi'] ?? '-'); ?>
-                                </div>
-                                <div>
-                                    <strong>Kota/Kabupaten:</strong> <?php echo htmlspecialchars($biodata['kota_kabupaten'] ?? '-'); ?>
-                                </div>
-                                <div>
-                                    <strong>Kecamatan:</strong> <?php echo htmlspecialchars($biodata['kecamatan'] ?? '-'); ?>
-                                </div>
-                                <div>
-                                    <strong>Kelurahan/Desa:</strong> <?php echo htmlspecialchars($biodata['kelurahan_desa'] ?? '-'); ?>
-                                </div>
-                                <div>
-                                    <strong>RT/RW:</strong> <?php echo htmlspecialchars($biodata['rt_rw'] ?? '-'); ?>
-                                </div>
-                                <div>
-                                    <strong>Kode Pos:</strong> <?php echo htmlspecialchars($biodata['kode_pos'] ?? '-'); ?>
-                                </div>
+                            <dt class="col-sm-3">NIK</dt>
+                            <dd class="col-sm-9"><?php echo htmlspecialchars($biodata['nik'] ?? '-'); ?></dd>
+                            
+                            <dt class="col-sm-3">Nama Lengkap</dt>
+                            <dd class="col-sm-9"><?php echo htmlspecialchars($biodata['nama']); ?></dd>
+                            
+                            <dt class="col-sm-3">Tempat, Tanggal Lahir</dt>
+                            <dd class="col-sm-9"><?php echo htmlspecialchars($biodata['ttl']); ?></dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <!-- Alamat -->
+                <div class="card card-info card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-map-marker-alt mr-2"></i>Alamat Lengkap</h3>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Alamat:</strong></p>
+                        <p><?php echo nl2br(htmlspecialchars($biodata['alamat'])); ?></p>
+                        
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <p><strong>Provinsi:</strong> <?php echo htmlspecialchars($biodata['provinsi'] ?? '-'); ?></p>
+                                <p><strong>Kota/Kabupaten:</strong> <?php echo htmlspecialchars($biodata['kota_kabupaten'] ?? '-'); ?></p>
+                                <p><strong>Kecamatan:</strong> <?php echo htmlspecialchars($biodata['kecamatan'] ?? '-'); ?></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Kelurahan/Desa:</strong> <?php echo htmlspecialchars($biodata['kelurahan_desa'] ?? '-'); ?></p>
+                                <p><strong>RT/RW:</strong> <?php echo htmlspecialchars($biodata['rt_rw'] ?? '-'); ?></p>
+                                <p><strong>Kode Pos:</strong> <?php echo htmlspecialchars($biodata['kode_pos'] ?? '-'); ?></p>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Data Pribadi -->
-                    <div class="info-card">
-                        <h3>👤 Data Pribadi</h3>
-                        <div class="info-row">
-                            <div class="info-label">Jenis Kelamin:</div>
-                            <div class="info-value"><?php echo $biodata['jenis_kelamin'] == 'L' ? 'Laki-laki' : 'Perempuan'; ?></div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Golongan Darah:</div>
-                            <div class="info-value"><?php echo htmlspecialchars($biodata['golongan_darah'] ?? '-'); ?></div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Status Perkawinan:</div>
-                            <div class="info-value">
+                </div>
+
+                <!-- Data Pribadi -->
+                <div class="card card-success card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-user mr-2"></i>Data Pribadi</h3>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-3">Jenis Kelamin</dt>
+                            <dd class="col-sm-9"><?php echo $biodata['jenis_kelamin'] == 'L' ? 'Laki-laki' : 'Perempuan'; ?></dd>
+                            
+                            <dt class="col-sm-3">Golongan Darah</dt>
+                            <dd class="col-sm-9"><?php echo htmlspecialchars($biodata['golongan_darah'] ?? '-'); ?></dd>
+                            
+                            <dt class="col-sm-3">Status Perkawinan</dt>
+                            <dd class="col-sm-9">
                                 <?php 
                                 $status = [
                                     'BM' => 'Belum Menikah',
@@ -180,126 +154,135 @@ $lowongan_result = mysqli_query($conn, $lowongan_query);
                                 ];
                                 echo $status[$biodata['status']] ?? '-';
                                 ?>
-                            </div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Pekerjaan Saat Ini:</div>
-                            <div class="info-value"><?php echo htmlspecialchars($biodata['pekerjaan'] ?? '-'); ?></div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Agama:</div>
-                            <div class="info-value"><?php echo htmlspecialchars($biodata['agama']); ?></div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">Kewarganegaraan:</div>
-                            <div class="info-value"><?php echo htmlspecialchars($biodata['kewarganegaraan'] ?? '-'); ?></div>
-                        </div>
+                            </dd>
+                            
+                            <dt class="col-sm-3">Pekerjaan Saat Ini</dt>
+                            <dd class="col-sm-9"><?php echo htmlspecialchars($biodata['pekerjaan'] ?? '-'); ?></dd>
+                            
+                            <dt class="col-sm-3">Agama</dt>
+                            <dd class="col-sm-9"><?php echo htmlspecialchars($biodata['agama']); ?></dd>
+                            
+                            <dt class="col-sm-3">Kewarganegaraan</dt>
+                            <dd class="col-sm-9"><?php echo htmlspecialchars($biodata['kewarganegaraan'] ?? '-'); ?></dd>
+                            
+                            <dt class="col-sm-3">Email</dt>
+                            <dd class="col-sm-9"><?php echo htmlspecialchars($biodata['email']); ?></dd>
+                            
+                            <dt class="col-sm-3">No. HP</dt>
+                            <dd class="col-sm-9"><?php echo htmlspecialchars($biodata['no_hp']); ?></dd>
+                        </dl>
                     </div>
-                    
-                    <!-- Kontak -->
-                    <div class="info-card">
-                        <h3>📞 Informasi Kontak</h3>
-                        <div class="info-row">
-                            <div class="info-label">Email:</div>
-                            <div class="info-value"><?php echo htmlspecialchars($biodata['email']); ?></div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">No. HP:</div>
-                            <div class="info-value"><?php echo htmlspecialchars($biodata['no_hp']); ?></div>
-                        </div>
+                </div>
+
+                <!-- Pendidikan -->
+                <div class="card card-warning card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-graduation-cap mr-2"></i>Riwayat Pendidikan</h3>
                     </div>
-                    
-                    <!-- Pendidikan Section -->
-                    <h3 class="section-title">🎓 Riwayat Pendidikan</h3>
-                    <?php if (mysqli_num_rows($pendidikan_result) > 0): ?>
-                        <div class="table-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Jenjang</th>
-                                        <th>Nama Sekolah</th>
-                                        <th>Tahun Masuk</th>
-                                        <th>Tahun Lulus</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php while ($pendidikan = mysqli_fetch_assoc($pendidikan_result)): ?>
-                                    <tr>
-                                        <td><?php echo $pendidikan['jenjang']; ?></td>
-                                        <td><?php echo htmlspecialchars($pendidikan['nama_sekolah']); ?></td>
-                                        <td><?php echo $pendidikan['tahun_masuk']; ?></td>
-                                        <td><?php echo $pendidikan['tahun_lulus']; ?></td>
-                                    </tr>
-                                    <?php endwhile; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    <?php else: ?>
-                        <p style="color: #888; padding: 15px; background: #f8f9fa; border-radius: 5px;">Belum ada data pendidikan.</p>
-                    <?php endif; ?>
-                    
-                    <!-- Pengalaman Kerja Section -->
-                    <h3 class="section-title">💼 Pengalaman Kerja</h3>
-                    <?php if (mysqli_num_rows($pk_result) > 0): ?>
-                        <div class="table-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Perusahaan</th>
-                                        <th>Posisi</th>
-                                        <th>Jenis</th>
-                                        <th>Mulai</th>
-                                        <th>Selesai</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php while ($pk = mysqli_fetch_assoc($pk_result)): ?>
-                                    <tr>
-                                        <td><?php echo htmlspecialchars($pk['nama_perusahaan']); ?></td>
-                                        <td><?php echo htmlspecialchars($pk['posisi']); ?></td>
-                                        <td><?php echo $pk['jenis']; ?></td>
-                                        <td><?php echo date('d/m/Y', strtotime($pk['mulai'])); ?></td>
-                                        <td><?php echo date('d/m/Y', strtotime($pk['selesai'])); ?></td>
-                                    </tr>
-                                    <?php endwhile; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    <?php else: ?>
-                        <p style="color: #888; padding: 15px; background: #f8f9fa; border-radius: 5px;">Belum ada data pengalaman kerja.</p>
-                    <?php endif; ?>
-                    
-                    <!-- Lowongan Dipilih Section -->
-                    <h3 class="section-title">📝 Lowongan Yang Dipilih</h3>
-                    <?php if (mysqli_num_rows($lowongan_result) > 0): ?>
-                        <div class="table-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Posisi</th>
-                                        <th>Tanggal Interview</th>
-                                        <th>Tanggal TKD</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php while ($lowongan = mysqli_fetch_assoc($lowongan_result)): ?>
-                                    <tr>
-                                        <td><?php echo htmlspecialchars($lowongan['posisi']); ?></td>
-                                        <td><?php echo date('d/m/Y', strtotime($lowongan['tgl_interview'])); ?></td>
-                                        <td><?php echo date('d/m/Y', strtotime($lowongan['tgl_tkd'])); ?></td>
-                                        <td><span style="color: #28a745;">✓ Terdaftar</span></td>
-                                    </tr>
-                                    <?php endwhile; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    <?php else: ?>
-                        <p style="color: #888; padding: 15px; background: #f8f9fa; border-radius: 5px;">Belum memilih lowongan.</p>
-                    <?php endif; ?>
+                    <div class="card-body">
+                        <?php if (mysqli_num_rows($pendidikan_result) > 0): ?>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Jenjang</th>
+                                    <th>Nama Sekolah</th>
+                                    <th>Tahun Masuk</th>
+                                    <th>Tahun Lulus</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php while ($pendidikan = mysqli_fetch_assoc($pendidikan_result)): ?>
+                                <tr>
+                                    <td><?php echo $pendidikan['jenjang']; ?></td>
+                                    <td><?php echo htmlspecialchars($pendidikan['nama_sekolah']); ?></td>
+                                    <td><?php echo $pendidikan['tahun_masuk']; ?></td>
+                                    <td><?php echo $pendidikan['tahun_lulus']; ?></td>
+                                </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                        <?php else: ?>
+                        <p class="text-muted">Belum ada data pendidikan.</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- Pengalaman Kerja -->
+                <div class="card card-danger card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-briefcase mr-2"></i>Pengalaman Kerja</h3>
+                    </div>
+                    <div class="card-body">
+                        <?php if (mysqli_num_rows($pk_result) > 0): ?>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Perusahaan</th>
+                                    <th>Posisi</th>
+                                    <th>Jenis</th>
+                                    <th>Mulai</th>
+                                    <th>Selesai</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php while ($pk = mysqli_fetch_assoc($pk_result)): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($pk['nama_perusahaan']); ?></td>
+                                    <td><?php echo htmlspecialchars($pk['posisi']); ?></td>
+                                    <td><?php echo $pk['jenis']; ?></td>
+                                    <td><?php echo date('d/m/Y', strtotime($pk['mulai'])); ?></td>
+                                    <td><?php echo date('d/m/Y', strtotime($pk['selesai'])); ?></td>
+                                </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                        <?php else: ?>
+                        <p class="text-muted">Belum ada data pengalaman kerja.</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- Lowongan -->
+                <div class="card card-secondary card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-file-alt mr-2"></i>Lowongan Yang Dipilih</h3>
+                    </div>
+                    <div class="card-body">
+                        <?php if (mysqli_num_rows($lowongan_result) > 0): ?>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Posisi</th>
+                                    <th>Tanggal Interview</th>
+                                    <th>Tanggal TKD</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php while ($lowongan = mysqli_fetch_assoc($lowongan_result)): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($lowongan['posisi']); ?></td>
+                                    <td><?php echo date('d/m/Y', strtotime($lowongan['tgl_interview'])); ?></td>
+                                    <td><?php echo date('d/m/Y', strtotime($lowongan['tgl_tkd'])); ?></td>
+                                    <td><span class="badge badge-success"><i class="fas fa-check"></i> Terdaftar</span></td>
+                                </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                        <?php else: ?>
+                        <p class="text-muted">Belum memilih lowongan.</p>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
-        </main>
+        </section>
     </div>
+
+    <?php include 'includes/footer.php'; ?>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.1/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/js/adminlte.min.js"></script>
 </body>
 </html>

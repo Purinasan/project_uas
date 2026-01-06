@@ -2,7 +2,6 @@
 session_start();
 require_once '../config.php';
 
-// Check if user is calon_karyawan
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'calon_karyawan') {
     header("Location: ../login.php");
     exit();
@@ -11,7 +10,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'calon_karyawan') {
 $username = $_SESSION['username'];
 $user_id = $_SESSION['user_id'];
 
-// Check if biodata exists
 $biodata_query = "SELECT * FROM biodata WHERE id_user = $user_id";
 $biodata_result = mysqli_query($conn, $biodata_query);
 $has_biodata = mysqli_num_rows($biodata_result) > 0;
@@ -26,94 +24,125 @@ if ($has_biodata) {
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Calon Karyawan</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard - Calon Karyawan</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="../assets/adminlte/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="../assets/adminlte/dist/css/adminlte.min.css">
 </head>
-<body class="dashboard-body">
-    <div class="dashboard-container">
-        <nav class="sidebar">
-            <div class="logo">
-                <h2>PT Maju Mundur</h2>
-            </div>
-            <ul class="nav-menu">
-                <li class="active"><a href="dashboard_karyawan.php">🏠 Dashboard</a></li>
-                <li><a href="biodata.php">📋 Biodata</a></li>
-                <li><a href="pemilihan_lowongan.php">💼 Pemilihan Lowongan</a></li>
-                <li><a href="penilaian.php">📊 Penilaian</a></li>
-            </ul>
-            <div class="nav-footer">
-                <a href="../logout.php" class="logout-btn">🚪 Logout</a>
-            </div>
-        </nav>
-        
-        <main class="main-content">
-            <header class="top-bar">
-                <h1>Dashboard Calon Karyawan</h1>
-                <div class="user-info">
-                    <span class="user-role">Calon Karyawan</span>
-                    <span class="user-name"><?php echo htmlspecialchars($username); ?></span>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+    
+    <?php include 'includes/header.php'; ?>
+    <?php include 'includes/sidebar.php'; ?>
+    
+    <div class="content-wrapper">
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0"><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+                    </div>
                 </div>
-            </header>
-            
-            <div class="content">
-                <div class="welcome-card">
-                    <h2>Selamat Datang, <?php echo htmlspecialchars($username); ?>! 👋</h2>
-                    <p>Lengkapi biodata Anda untuk melanjutkan proses rekrutmen</p>
+            </div>
+        </div>
+
+        <section class="content">
+            <div class="container-fluid">
+
+                <div class="card card-primary card-outline">
+                    <div class="card-body">
+                        <h3><i class="fas fa-hand-sparkles"></i> Selamat Datang, <?php echo htmlspecialchars($username); ?>!</h3>
+                        <p class="mb-0">Lengkapi biodata Anda untuk melanjutkan proses rekrutmen</p>
+                    </div>
                 </div>
                 
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">📝</div>
-                        <div class="stat-info">
-                            <h3>Status Biodata</h3>
-                            <p class="stat-number">
-                                <?php 
-                                if ($status_akun == 0) echo "Belum Lengkap";
-                                elseif ($status_akun == 1) echo "Tersubmit";
-                                elseif ($status_akun == 2) echo "Divalidasi";
-                                else echo "Belum Ada";
-                                ?>
-                            </p>
+                <div class="row">
+                    <div class="col-lg-4 col-6">
+                        <div class="small-box bg-info">
+                            <div class="inner">
+                                <h3>
+                                    <?php 
+                                    if ($status_akun == 0) echo "Belum Lengkap";
+                                    elseif ($status_akun == 1) echo "Tersubmit";
+                                    elseif ($status_akun == 2) echo "Divalidasi";
+                                    else echo "Belum Ada";
+                                    ?>
+                                </h3>
+                                <p>Status Biodata</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <a href="biodata.php" class="small-box-footer">
+                                Lihat Detail <i class="fas fa-arrow-circle-right"></i>
+                            </a>
                         </div>
                     </div>
                     
-                    <div class="stat-card">
-                        <div class="stat-icon">💼</div>
-                        <div class="stat-info">
-                            <h3>Lowongan Dipilih</h3>
-                            <p class="stat-number">
-                                <?php
-                                if ($has_biodata) {
-                                    $lowongan_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM pemilihan_lowongan WHERE id_biodata = '{$biodata['id_biodata']}'"))['total'];
-                                    echo $lowongan_count;
-                                } else {
-                                    echo "0";
-                                }
-                                ?>
-                            </p>
+                    <div class="col-lg-4 col-6">
+                        <div class="small-box bg-success">
+                            <div class="inner">
+                                <h3>
+                                    <?php
+                                    if ($has_biodata) {
+                                        $lowongan_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM pemilihan_lowongan WHERE id_biodata = '{$biodata['id_biodata']}'"))['total'];
+                                        echo $lowongan_count;
+                                    } else {
+                                        echo "0";
+                                    }
+                                    ?>
+                                </h3>
+                                <p>Lowongan Dipilih</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            <a href="pemilihan_lowongan.php" class="small-box-footer">
+                                Lihat Detail <i class="fas fa-arrow-circle-right"></i>
+                            </a>
                         </div>
                     </div>
                     
-                    <div class="stat-card">
-                        <div class="stat-icon">🎯</div>
-                        <div class="stat-info">
-                            <h3>Status Penilaian</h3>
-                            <p class="stat-number">-</p>
+                    <div class="col-lg-4 col-6">
+                        <div class="small-box bg-warning">
+                            <div class="inner">
+                                <h3>-</h3>
+                                <p>Status Penilaian</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <a href="penilaian.php" class="small-box-footer">
+                                Lihat Detail <i class="fas fa-arrow-circle-right"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
                 
                 <?php if (!$has_biodata || $status_akun == 0): ?>
-                <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 20px; border-radius: 8px; margin-top: 20px;">
-                    <h3 style="margin-bottom: 10px; color: #856404;">⚠️ Perhatian!</h3>
-                    <p style="color: #856404; margin-bottom: 15px;">Silakan lengkapi biodata Anda terlebih dahulu sebelum memilih lowongan.</p>
-                    <a href="biodata.php" style="display: inline-block; padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 5px;">Lengkapi Biodata</a>
+                <div class="alert alert-warning alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    <h5><i class="icon fas fa-exclamation-triangle"></i> Perhatian!</h5>
+                    Silakan lengkapi biodata Anda terlebih dahulu sebelum memilih lowongan.
+                    <br><br>
+                    <a href="biodata.php" class="btn btn-sm btn-primary">
+                        <i class="fas fa-edit"></i> Lengkapi Biodata
+                    </a>
                 </div>
                 <?php endif; ?>
+                
             </div>
-        </main>
+        </section>
     </div>
+    
+    <?php include 'includes/footer.php'; ?>
+</div>
+
+<script src="../assets/adminlte/plugins/jquery/jquery.min.js"></script>
+<script src="../assets/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/adminlte/dist/js/adminlte.min.js"></script>
 </body>
 </html>
